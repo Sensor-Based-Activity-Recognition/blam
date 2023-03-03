@@ -1,0 +1,2 @@
+polars==0.16.8
+questdb==1.1.0

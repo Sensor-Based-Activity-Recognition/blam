@@ -1,0 +1,6 @@
+{
+    "questdb": {
+        "host": "docker.caracal-lime.ts.net",
+        "port": 9009
+    }
+}
