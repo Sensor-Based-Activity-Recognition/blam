@@ -193,13 +193,11 @@ class DataSelector:
             def disable(self, *args):
                 self.figure.canvas.mpl_disconnect(self.__clickEvent_gid)
 
-                self.removeMarker()
-
         # check if index has correct type
         if not isinstance(self.df.index, pd.DatetimeIndex):
             raise Exception("index of df must be from type 'pandas.DatetimeIndex'")
         
-        #check if time is monotonic increasing
+        # check if time is monotonic increasing
         if not self.df.index.is_monotonic_increasing:
             fig, ax = plt.subplots(1,1)
             ax.plot(self.df.index.values)
@@ -272,7 +270,7 @@ class DataSelector:
         )
         fig.canvas.manager.toolbar.add_tool("Marker", "Additionals")
 
-        #start maximized
+        # start maximized
         figManager = plt.get_current_fig_manager()
         figManager.window.showMaximized()
 

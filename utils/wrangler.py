@@ -165,6 +165,9 @@ class File:
         # add activity name to columns as activity
         data = data.with_columns(pl.lit(self.path.split("/")[-3]).alias("activity"))
 
+        # sort time
+        data = data.sort("time")
+
         # collect 2
         data = data.collect()
 
