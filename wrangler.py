@@ -82,6 +82,54 @@ class File:
                 # concat data if data is not None, else set data to temp
                 data = temp if data is None else pl.concat([data, temp])
 
+        return self.__table_pivotter(data)
+
+    def get_data_json(self):
+        """
+        Returns the json data as a polars DataFrame
+
+        Returns:
+            polars.DataFrame: Dataframe with the data
+        """
+        # check if data is already loaded
+        if self.data is None:
+            # error handling
+            try:
+                # read json + lazy
+                data = pl.read_json(self.path).lazy()
+
+                # melt data grouped by time and sensor
+                data = data.melt(id_vars=["time", "sensor"])
+
+                # rename variable to sensor_variable
+                data = data.with_columns(
+                    (pl.col("sensor") + "_" + pl.col("variable")).alias("variable")
+                )
+
+                # drop sensor column
+                data = data.drop(["sensor"])
+
+                # time to int
+                data = data.with_columns(pl.col("time").cast(pl.Int64).alias("time"))
+
+                return self.__table_pivotter(data)
+            except Exception as e:
+                # throw error if occurred
+                print(f"Error processing {self.path}: {e}")
+                return None
+
+        return self.data
+
+    def __table_pivotter(self, data):
+        """
+        Private Helper function to pivot the data
+
+        Args:
+            data (polars.DataFrame): Dataframe with the data to pivot
+
+        Returns:
+            polars.DataFrame: Dataframe with the pivoted data
+        """
         # change resolution of data to 10ms
         data = data.with_columns(
             (pl.col("time") // 10000000 * 10).cast(pl.Int64).alias("time")
@@ -128,93 +176,6 @@ class File:
         self.data = data
 
         # return data
-        return self.data
-
-    def get_data_json(self):
-        """
-        Returns the json data as a polars DataFrame
-
-        Returns:
-            polars.DataFrame: Dataframe with the data
-        """
-        # check if data is already loaded
-        if self.data is None:
-            # error handling
-            try:
-                # read json + lazy
-                data = pl.read_json(self.path).lazy()
-
-                # melt data grouped by time and sensor
-                data = data.melt(id_vars=["time", "sensor"])
-
-                # rename variable to sensor_variable
-                data = data.with_columns(
-                    (pl.col("sensor") + "_" + pl.col("variable")).alias("variable")
-                )
-
-                # drop sensor column
-                data = data.drop(["sensor"])
-
-                # time to int
-                data = data.with_columns(pl.col("time").cast(pl.Int64).alias("time"))
-
-                # change resolution of data to 10ms
-                data = data.with_columns(
-                    (pl.col("time") // 10000000 * 10).cast(pl.Int64).alias("time")
-                )
-
-                # change time measurements from nanoseconds to milliseconds
-                data = data.with_columns(pl.from_epoch("time", unit="ms").alias("time"))
-
-                # convert values to float if possible
-                data = data.with_columns(
-                    pl.col("value").cast(pl.Float32, strict=False).alias("value")
-                )
-
-                # filter sensors
-                data = data.filter(pl.col("variable").is_in(self.sensors))
-
-                # collect 1
-                data = data.collect()
-
-                # pivot the data + lazy
-                data = data.pivot(
-                    index="time",
-                    columns="variable",
-                    values="value",
-                    aggregate_function="mean",
-                    sort_columns=True,
-                ).lazy()
-
-                # add file name to columns as filename
-                data = data.with_columns(
-                    pl.lit(self.path.split("/")[-1].split(".")[0]).alias("filename")
-                )
-
-                # add person name to columns as person
-                data = data.with_columns(
-                    pl.lit(self.path.split("/")[-2]).alias("person")
-                )
-
-                # add activity name to columns as activity
-                data = data.with_columns(
-                    pl.lit(self.path.split("/")[-3]).alias("activity")
-                )
-
-                # collect 2
-                data = data.collect()
-
-                # set data
-                self.data = data
-
-                # return data
-                return self.data
-
-            except Exception as e:
-                # throw error if occurred
-                print(f"Error processing {self.path}: {e}")
-                return None
-
         return self.data
 
     def write_data(self, data=None, table="test"):
