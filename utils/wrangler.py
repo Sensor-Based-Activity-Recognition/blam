@@ -198,6 +198,9 @@ class File:
             # insert random hash to data
             data["hash"] = uuid.uuid4().hex
 
+            # rename time to timestamp
+            data = data.rename(columns={"time": "timestamp"})
+
             # write data to database
             with Sender(questdb_settings["host"], questdb_settings["port"]) as sender:
                 # note: polars DataFrame needs to be converted to pandas DataFrame
