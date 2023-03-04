@@ -21,7 +21,7 @@ class DataSelector:
             title_prefix (str): title
         """
 
-        self.df = df
+        self.df:pd.DataFrame = df
         self.show_cols = show_cols
         self.title_prefix = title_prefix
 
@@ -44,6 +44,9 @@ class DataSelector:
         freq = 1 / np.diff(time)  # get frequencies
         freq_copy = np.copy(freq)  # copy frequencies
 
+        if not (freq > 0).all():
+            raise Exception("time is not monotonic increasing")
+
         # calculate parameter for normal distribution in while loop
         mean = np.mean(freq_copy)
         std = np.std(freq_copy)
@@ -60,6 +63,8 @@ class DataSelector:
             if isinstance(old_startArgs, np.ndarray):  # if not first time
                 if np.array_equal(old_startArgs, startArgs):  # successfully converged
                     return startArgs.flatten()
+                
+                old_startArgs = startArgs #override
 
             else:  # first time (no value store in old_startArgs)
                 old_startArgs = startArgs
@@ -90,6 +95,9 @@ class DataSelector:
 
         freq = 1 / np.diff(time)  # get frequencies
 
+        if not (freq > 0).all():
+            raise Exception("time is not monotonic increasing")
+
         return np.mean(freq)  # return mean
 
     def get_std_fs(self, time: np.array) -> float:
@@ -105,6 +113,9 @@ class DataSelector:
             raise TypeError("time must be from a floating type")
 
         freq = 1 / np.diff(time)  # get frequencies
+
+        if not (freq > 0).all():
+            raise Exception("time is not monotonic increasing")
 
         return np.std(freq)  # return std
 
@@ -187,6 +198,23 @@ class DataSelector:
         # check if index has correct type
         if not isinstance(self.df.index, pd.DatetimeIndex):
             raise Exception("index of df must be from type 'pandas.DatetimeIndex'")
+        
+        #check if time is monotonic increasing
+        if not self.df.index.is_monotonic_increasing:
+            fig, ax = plt.subplots(1,1)
+            ax.plot(self.df.index.values)
+            ax.set_xlabel("index")
+            ax.set_ylabel("time")
+            ax.set_title("It looks like the time is not monotonic increasing... please fix this!")
+            
+            #start maximized
+            figManager = plt.get_current_fig_manager()
+            figManager.window.showMaximized()
+
+            plt.show(block=True)
+
+            raise Exception("time not monotonic increasing")
+
 
         normalized_index = (self.df.index - self.df.index[0]) / pd.Timedelta(
             1, "s"
@@ -243,6 +271,11 @@ class DataSelector:
             "Marker", Marker, gid="marker"
         )
         fig.canvas.manager.toolbar.add_tool("Marker", "Additionals")
+
+        #start maximized
+        figManager = plt.get_current_fig_manager()
+        figManager.window.showMaximized()
+
         plt.show(block=True)
 
         # check if no area selected
