@@ -1,4 +1,5 @@
 import json
+import uuid
 import polars as pl
 
 from zipfile import ZipFile
@@ -182,7 +183,7 @@ class File:
         Writes the data to the database
 
         Args:
-            data (polars.DataFrame): Dataframe with the data
+            data (pandas.DataFrame): Dataframe with the data
             table (str): Name of the table to write to
 
         Returns:
@@ -193,6 +194,10 @@ class File:
             # check if data was passed, if not, use self.data
             if data is None:
                 data = self.data
+
+            # insert random hash to data
+            data["hash"] = uuid.uuid4().hex
+
             # write data to database
             with Sender(questdb_settings["host"], questdb_settings["port"]) as sender:
                 # note: polars DataFrame needs to be converted to pandas DataFrame
