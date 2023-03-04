@@ -10,6 +10,17 @@ from matplotlib.backend_tools import ToolToggleBase
 plt.rcParams["toolbar"] = "toolmanager"
 mpl.use("qtagg")
 
+# visuals
+## dark modeeeee
+plt.style.use("dark_background")
+## dpi
+mpl.rcParams["figure.dpi"] = 80
+## thin layout
+mpl.rcParams["figure.subplot.left"] = 0.05
+mpl.rcParams["figure.subplot.right"] = 0.98
+mpl.rcParams["figure.subplot.bottom"] = 0.06
+mpl.rcParams["figure.subplot.top"] = 0.95
+
 
 class Selector:
     def __init__(
