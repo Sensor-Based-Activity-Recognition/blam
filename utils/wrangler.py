@@ -201,6 +201,9 @@ class File:
             # rename time to timestamp
             data = data.rename(columns={"time": "timestamp"})
 
+            # convert timestamp to unix int
+            data["timestamp"] = data["timestamp"].astype(int)
+
             # write data to database
             with Sender(questdb_settings["host"], questdb_settings["port"]) as sender:
                 # note: polars DataFrame needs to be converted to pandas DataFrame
