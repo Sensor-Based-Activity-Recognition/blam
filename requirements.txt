@@ -1,3 +1,6 @@
-polars==0.16.8
+pandas==1.5.3
+polars==0.16.10
+scipy==1.10.1
+matplotlib==3.7.1
+tk==0.1.0
 questdb==1.1.0
-ipympl==0.9.3
