@@ -4,10 +4,6 @@ import polars as pl
 from zipfile import ZipFile
 from questdb.ingress import Sender
 
-# read config.json file
-with open("config.json") as json_data_file:
-    config = json.load(json_data_file)
-
 
 class File:
     """
@@ -20,7 +16,7 @@ class File:
         get_data: Returns the data as a polars DataFrame
     """
 
-    def __init__(self, path="./", sensors=["time"], data=None):
+    def __init__(self, path, sensors, data=None):
         """
         Args:
             path (str): Path to the dataset
@@ -178,7 +174,7 @@ class File:
         # return data
         return self.data
 
-    def write_data(self, data=None, table="test"):
+    def write_data(self, questdb_settings, data=None, table="test"):
         """
         Writes the data to the database
 
@@ -195,9 +191,9 @@ class File:
             if data is None:
                 data = self.data
             # write data to database
-            with Sender(config["questdb"]["host"], config["questdb"]["port"]) as sender:
+            with Sender(questdb_settings["host"], questdb_settings["port"]) as sender:
                 # note: polars DataFrame needs to be converted to pandas DataFrame
-                sender.dataframe(df=data.to_pandas(), table_name=table)
+                sender.dataframe(df=data, table_name=table)
             # return True if successful
             return True
 

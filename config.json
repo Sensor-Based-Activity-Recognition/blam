@@ -2,5 +2,14 @@
     "questdb": {
         "host": "docker.caracal-lime.ts.net",
         "port": 9009
-    }
+    },
+    "OneDriveFolder": "/Users/gabriel.torres/Library/CloudStorage/OneDrive-FHNW/CDL1 Sensor Data",
+    "sensors": [
+        "Accelerometer_x",
+        "Accelerometer_y",
+        "Accelerometer_z",
+        "AccelerometerUncalibrated_x",
+        "AccelerometerUncalibrated_y",
+        "AccelerometerUncalibrated_z"
+    ]
 }
