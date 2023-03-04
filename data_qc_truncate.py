@@ -209,7 +209,7 @@ def truncate(df:pd.DataFrame, title_prefix:str, **kwargs) -> pd.DataFrame:
 
     return df.loc[(df_converted.index.values >= toggleButton.xcordBegin) & (df_converted.index.values <= toggleButton.xcordEnd)]
 
-x = np.linspace(0, 2*np.pi, 10000)
+""" x = np.linspace(0, 2*np.pi, 10000)
 
 df = pd.DataFrame(data={
     "col1": np.sin(x),
@@ -218,4 +218,4 @@ df = pd.DataFrame(data={
 
 df = pd.concat((df.iloc[:5000], df.iloc[5100:]), axis=0)
 
-print(truncate(df, "test"))
+print(truncate(df, "test")) """
