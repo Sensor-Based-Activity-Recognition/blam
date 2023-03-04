@@ -8,7 +8,7 @@ from matplotlib.lines import Line2D
 from matplotlib.backend_tools import ToolToggleBase
 
 plt.rcParams["toolbar"] = "toolmanager"
-
+mpl.use('qtagg')
 
 class DataSelector:
     def __init__(
@@ -242,9 +242,8 @@ class DataSelector:
         toggleButton: Marker = fig.canvas.manager.toolmanager.add_tool(
             "Marker", Marker, gid="marker"
         )
-        plt.ion()
         fig.canvas.manager.toolbar.add_tool("Marker", "Additionals")
-        plt.show()
+        plt.show(block=True)
 
         # check if no area selected
         if not toggleButton.xcordBegin or not toggleButton.xcordEnd:
