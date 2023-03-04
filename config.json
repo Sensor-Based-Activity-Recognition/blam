@@ -11,5 +11,6 @@
         "AccelerometerUncalibrated_x",
         "AccelerometerUncalibrated_y",
         "AccelerometerUncalibrated_z"
-    ]
+    ],
+    "dev": true
 }
