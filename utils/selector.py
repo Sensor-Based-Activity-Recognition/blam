@@ -8,9 +8,10 @@ from matplotlib.lines import Line2D
 from matplotlib.backend_tools import ToolToggleBase
 
 plt.rcParams["toolbar"] = "toolmanager"
-mpl.use('qtagg')
+mpl.use("qtagg")
 
-class DataSelector:
+
+class Selector:
     def __init__(
         self, df: pd.DataFrame = None, title_prefix: str = "", show_cols: list = []
     ) -> None:
@@ -21,7 +22,7 @@ class DataSelector:
             title_prefix (str): title
         """
 
-        self.df:pd.DataFrame = df
+        self.df: pd.DataFrame = df
         self.show_cols = show_cols
         self.title_prefix = title_prefix
 
@@ -60,14 +61,12 @@ class DataSelector:
 
             startArgs = np.argwhere(freq < thres)  # find startArgs
 
-            if isinstance(old_startArgs, np.ndarray):  # if not first time
-                if np.array_equal(old_startArgs, startArgs):  # successfully converged
-                    return startArgs.flatten()
-                
-                old_startArgs = startArgs #override
+            if isinstance(old_startArgs, np.ndarray) and np.array_equal(
+                old_startArgs, startArgs
+            ):
+                return startArgs.flatten()
 
-            else:  # first time (no value store in old_startArgs)
-                old_startArgs = startArgs
+            old_startArgs = startArgs  # override
 
             freq_copy = np.delete(freq, startArgs)  # delete all the 'bad frequencies'
 
@@ -196,23 +195,24 @@ class DataSelector:
         # check if index has correct type
         if not isinstance(self.df.index, pd.DatetimeIndex):
             raise Exception("index of df must be from type 'pandas.DatetimeIndex'")
-        
+
         # check if time is monotonic increasing
         if not self.df.index.is_monotonic_increasing:
-            fig, ax = plt.subplots(1,1)
+            fig, ax = plt.subplots(1, 1)
             ax.plot(self.df.index.values)
             ax.set_xlabel("index")
             ax.set_ylabel("time")
-            ax.set_title("It looks like the time is not monotonic increasing... please fix this!")
-            
-            #start maximized
+            ax.set_title(
+                "It looks like the time is not monotonic increasing... please fix this!"
+            )
+
+            # start maximized
             figManager = plt.get_current_fig_manager()
             figManager.window.showMaximized()
 
             plt.show(block=True)
 
             raise Exception("time not monotonic increasing")
-
 
         normalized_index = (self.df.index - self.df.index[0]) / pd.Timedelta(
             1, "s"

@@ -8,7 +8,7 @@ from tkinter import filedialog
 
 # utils code imports
 from utils.wrangler import File
-from utils.data_selector import DataSelector
+from utils.selector import Selector
 
 # get configs
 with open("config.json", "r") as f:
@@ -44,7 +44,7 @@ data = file.get_data().to_pandas().set_index("time")
 # get data selector
 try:
     truncated_data = (
-        DataSelector(
+        Selector(
             df=data, title_prefix=root.filename.split("/")[-1], show_cols=sensors[:3]
         )
         .truncate()
