@@ -88,10 +88,11 @@ def get_std_fs(time: np.array) -> float:
 
     return np.std(freq) #return std
 
-def truncate(df:pd.DataFrame, title_prefix:str, **kwargs) -> pd.DataFrame:
+def truncate(df:pd.DataFrame, title_prefix:str, show_cols:list=[], **kwargs) -> pd.DataFrame:
     """Interactive truncating of a dataframe (also shows gaps as red squares & displays metrics about sampling frequency in title) 
     Args:  
         df (pd.DataFrame): dataframe to truncate
+        show_cols (list): columns to show (if emply -> all columns are used)
         title_prefix (str): title 
     Returns:
         truncated dataframe
@@ -162,6 +163,11 @@ def truncate(df:pd.DataFrame, title_prefix:str, **kwargs) -> pd.DataFrame:
     df_converted = df.copy()
     df_converted.index = df_converted.index - df_converted.index[0] #make index relative
 
+    if len(show_cols) > 0:
+        cols_to_show = show_cols
+    else:
+        cols_to_show = df_converted.columns
+
     fig, ax = plt.subplots(1, 1)
 
     gapArgs = get_startArgs_of_gaps(df_converted.index.values, **kwargs) #get start args of gaps
@@ -172,7 +178,7 @@ def truncate(df:pd.DataFrame, title_prefix:str, **kwargs) -> pd.DataFrame:
         #first section
         first_sub_df = df_converted.loc[splitted_index[0]] #get first sub dataframe
         colors = {} #colors of columns stored here
-        for col in first_sub_df.columns: #plot columns
+        for col in cols_to_show: #plot columns
             colors[col] = ax.plot(first_sub_df.index.values, first_sub_df[col].values, label=col)[0].get_color()
         
         #iterate over remaining sections
@@ -185,16 +191,15 @@ def truncate(df:pd.DataFrame, title_prefix:str, **kwargs) -> pd.DataFrame:
             sub_df = df_converted.loc[splitted_index[i]] #get sub dataframe
             
             #plot columns
-            for col in sub_df.columns:
+            for col in cols_to_show:
                 ax.plot(sub_df.index.values, sub_df[col].values, color=colors[col])
 
     else:
         #plot columns
-        for col in df_converted.columns:
-            ax.plot(df_converted.index.values, df_converted[col].values, label=col)[0].get_color()
+        for col in cols_to_show:
+            ax.plot(df_converted.index.values, df_converted[col].values, label=col)
 
-    ax.plot(np.linspace(0, 2*np.pi, 1000), np.sin(np.linspace(0, 2*np.pi, 1000)))
-    ax.set_title(title_prefix + f"_[mean sf= {np.round(get_mean_fs(df_converted.index.values), 4)}Hz; std= {np.round(get_std_fs(df_converted.index.values), 4)}Hz]")
+    ax.set_title(title_prefix + f" [mean sf= {np.round(get_mean_fs(df_converted.index.values), 4)}Hz; std= {np.round(get_std_fs(df_converted.index.values), 4)}Hz]")
     ax.set_xlabel("relative time [s]")
     ax.set_ylabel("value")
     ax.legend()
