@@ -91,7 +91,7 @@ def get_std_fs(time: np.array) -> float:
 def truncate(df:pd.DataFrame, title_prefix:str, show_cols:list=[], **kwargs) -> pd.DataFrame:
     """Interactive truncating of a dataframe (also shows gaps as red squares & displays metrics about sampling frequency in title) 
     Args:  
-        df (pd.DataFrame): dataframe to truncate
+        df (pd.DataFrame): dataframe to truncate (time must be on index as pd.DatetimeIndex)
         show_cols (list): columns to show (if emply -> all columns are used)
         title_prefix (str): title 
     Returns:
@@ -160,23 +160,27 @@ def truncate(df:pd.DataFrame, title_prefix:str, show_cols:list=[], **kwargs) -> 
 
             self.removeMarker()
 
-    df_converted = df.copy()
-    df_converted.index = df_converted.index - df_converted.index[0] #make index relative
+    #check if index has correct type
+    if not isinstance(df.index, pd.DatetimeIndex):
+        raise Exception("index of df must be from type 'pandas.DatetimeIndex'")
 
+    normalized_index = (df.index - df.index[0]) / pd.Timedelta(1, "s") #make index relative and convert to seconds
+
+    #select cols (no selected -> select all)
     if len(show_cols) > 0:
         cols_to_show = show_cols
     else:
-        cols_to_show = df_converted.columns
+        cols_to_show = df.columns
 
     fig, ax = plt.subplots(1, 1)
 
-    gapArgs = get_startArgs_of_gaps(df_converted.index.values, **kwargs) #get start args of gaps
+    gapArgs = get_startArgs_of_gaps(normalized_index, **kwargs) #get start args of gaps
 
     if len(gapArgs) > 0: #if gaps found
-        splitted_index = np.split(df_converted.index.values, gapArgs + 1) #split index so gaps are in between of splits
+        splitted_index = np.split(df.index.values, gapArgs + 1) #split index so gaps are in between of splits
 
         #first section
-        first_sub_df = df_converted.loc[splitted_index[0]] #get first sub dataframe
+        first_sub_df = df.loc[splitted_index[0]] #get first sub dataframe
         colors = {} #colors of columns stored here
         for col in cols_to_show: #plot columns
             colors[col] = ax.plot(first_sub_df.index.values, first_sub_df[col].values, label=col)[0].get_color()
@@ -188,7 +192,7 @@ def truncate(df:pd.DataFrame, title_prefix:str, show_cols:list=[], **kwargs) -> 
             gap_end_x = splitted_index[i][0]
             ax.axvspan(gap_start_x, gap_end_x, color="red", alpha=0.1)
 
-            sub_df = df_converted.loc[splitted_index[i]] #get sub dataframe
+            sub_df = df.loc[splitted_index[i]] #get sub dataframe
             
             #plot columns
             for col in cols_to_show:
@@ -197,9 +201,9 @@ def truncate(df:pd.DataFrame, title_prefix:str, show_cols:list=[], **kwargs) -> 
     else:
         #plot columns
         for col in cols_to_show:
-            ax.plot(df_converted.index.values, df_converted[col].values, label=col)
+            ax.plot(df.index.values, df[col].values, label=col)
 
-    ax.set_title(title_prefix + f" [mean sf= {np.round(get_mean_fs(df_converted.index.values), 4)}Hz; std= {np.round(get_std_fs(df_converted.index.values), 4)}Hz]")
+    ax.set_title(title_prefix + f" [mean sf= {np.round(get_mean_fs(normalized_index), 4)}Hz; std= {np.round(get_std_fs(normalized_index), 4)}Hz]")
     ax.set_xlabel("relative time [s]")
     ax.set_ylabel("value")
     ax.legend()
@@ -209,18 +213,12 @@ def truncate(df:pd.DataFrame, title_prefix:str, show_cols:list=[], **kwargs) -> 
     fig.canvas.manager.toolbar.add_tool("Marker", "Additionals")
     plt.show()
 
+    #check if no area selected
     if not toggleButton.xcordBegin or not toggleButton.xcordEnd:
         raise Exception("No area selected")
+    
+    #convert numbers we get from matplotlib to datetime
+    xStart_dateTime = np.datetime64(matplotlib.dates.num2date(toggleButton.xcordBegin))
+    xEnd_dateTime = np.datetime64(matplotlib.dates.num2date(toggleButton.xcordEnd))
 
-    return df.loc[(df_converted.index.values >= toggleButton.xcordBegin) & (df_converted.index.values <= toggleButton.xcordEnd)]
-
-""" x = np.linspace(0, 2*np.pi, 10000)
-
-df = pd.DataFrame(data={
-    "col1": np.sin(x),
-    "col2": np.cos(x),
-}, index=x)
-
-df = pd.concat((df.iloc[:5000], df.iloc[5100:]), axis=0)
-
-print(truncate(df, "test")) """
+    return df.loc[(df.index >= xStart_dateTime) & (df.index <= xEnd_dateTime)]
