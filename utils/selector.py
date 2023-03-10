@@ -255,7 +255,7 @@ class Selector:
                 # draw gap
                 gap_start_x = splitted_index[i - 1][-1]
                 gap_end_x = splitted_index[i][0]
-                ax.axvspan(gap_start_x, gap_end_x, color="red", alpha=0.1)
+                ax.axvspan(gap_start_x, gap_end_x, color="red", alpha=0.4)
 
                 sub_df = self.df.loc[splitted_index[i]]  # get sub dataframe
 

@@ -9,6 +9,7 @@ from tkinter import filedialog
 # utils code imports
 from utils.wrangler import File
 from utils.selector import Selector
+from utils.dbconnector import Database
 
 # get configs
 with open("config.json", "r") as f:
@@ -19,6 +20,9 @@ sensors = config["sensors"]
 OneDriveFolder = config["OneDriveFolder"]
 questdb_settings = config["questdb"]
 dev = config["dev"]
+
+# get database name
+db_name = "dev" if dev else "prod"
 
 # set up tkinter and hide root window
 root = Tk()
@@ -36,6 +40,18 @@ if not root.filename:
     messagebox.showerror("Error", "No file selected")
     # exit program
     exit(1)
+
+# check if file has already been processed
+short_filename = root.filename.split("/")[-1].split(".")[0]
+if n_datavals := Database().get_scalar(
+    f"SELECT count(*) AS value FROM {db_name} WHERE filename %3D '{short_filename}'"
+):
+    msg_box = messagebox.askyesno(
+        "File already processed",
+        f"File already processed with {n_datavals} values in Database. Continue?",
+    )
+    if not msg_box:
+        exit(0)
 
 # get file
 file = File(path=root.filename, sensors=sensors)
@@ -58,8 +74,6 @@ except Exception as e:
 
 # prompt if write to database
 if messagebox.askyesno("Write to database", "Write to database?"):
-    # get database name
-    db_name = "dev" if dev else "prod"
     # write to database
     if status := file.write_data(questdb_settings, truncated_data, db_name):
         messagebox.showinfo("Success", "Write successful")
