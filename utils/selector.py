@@ -8,7 +8,11 @@ from matplotlib.lines import Line2D
 from matplotlib.backend_tools import ToolToggleBase
 
 plt.rcParams["toolbar"] = "toolmanager"
-mpl.use("qtagg")
+
+try:
+    mpl.use("qtagg")
+except:
+    mpl.use("Qt5Agg")
 
 # visuals
 ## dark modeeeee
