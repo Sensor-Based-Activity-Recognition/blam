@@ -53,5 +53,5 @@
         "LocationGps_latitude",
         "LocationGps_longitude"
     ],
-    "dev": true
+    "dev": false
 }

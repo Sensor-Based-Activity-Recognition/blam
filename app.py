@@ -42,9 +42,12 @@ if not root.filename:
     exit(1)
 
 # check if file has already been processed
+person = root.filename.split("/")[-2]
+activity = root.filename.split("/")[-3]
 short_filename = root.filename.split("/")[-1].split(".")[0]
+
 if n_datavals := Database().get_scalar(
-    f"SELECT count(*) AS value FROM {db_name} WHERE filename %3D '{short_filename}'"
+    f"SELECT count(*) AS value FROM {db_name} WHERE filename %3D '{short_filename}' and person %3D '{person}' and activity %3D '{activity}'"
 ):
     msg_box = messagebox.askyesno(
         "File already processed",
