@@ -160,15 +160,15 @@ class Selector:
 
             def removeMarker(self):
                 if self.__line2D_1:
-                    ax.lines.remove(self.__line2D_1)
+                    self.__line2D_1.remove()
                     self.__line2D_1 = None
 
                 if self.__line2D_2:
-                    ax.lines.remove(self.__line2D_2)
+                    self.__line2D_2.remove()
                     self.__line2D_2 = None
 
                 if self.__polygon:
-                    ax.patches.remove(self.__polygon)
+                    self.__polygon.remove()
                     self.__polygon = None
 
                 self.xcordBegin = None
