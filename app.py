@@ -32,7 +32,7 @@ root.withdraw()
 root.filename = filedialog.askopenfilename(
     initialdir=OneDriveFolder,
     title="Select file",
-    filetypes=(("zip file", "*.zip"), ("json file", "*.json")),
+    filetypes=(("all", "*.*"), ("zip file", "*.zip"), ("json file", "*.json")),
 )
 # if no file is selected, exit program
 if not root.filename:
