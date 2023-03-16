@@ -202,7 +202,7 @@ class File:
             data = data.rename(columns={"time": "timestamp"})
 
             # convert timestamp to unix int
-            data["timestamp"] = data["timestamp"].astype(int)
+            data["timestamp"] = data["timestamp"].values.astype(int)
 
             # write data to database
             with Sender(questdb_settings["host"], questdb_settings["port"]) as sender:
