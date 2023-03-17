@@ -1,6 +1,7 @@
 import json
 import uuid
 import polars as pl
+import pandas as pd
 
 from zipfile import ZipFile
 from questdb.ingress import Sender
@@ -202,7 +203,7 @@ class File:
             data = data.rename(columns={"time": "timestamp"})
 
             # convert timestamp to unix int
-            data["timestamp"] = data["timestamp"].values.astype(int)
+            data["timestamp"] = (data["timestamp"] - pd.Timestamp("1970-01-01")) // pd.Timedelta('1ns')
 
             # write data to database
             with Sender(questdb_settings["host"], questdb_settings["port"]) as sender:
