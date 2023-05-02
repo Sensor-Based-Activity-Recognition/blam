@@ -1,6 +1,6 @@
 {
     "questdb": {
-        "host": "docker.caracal-lime.ts.net",
+        "host": "docker.great-squeaker.ts.net",
         "port": 9009,
         "port_web": 9000
     },
@@ -9,35 +9,27 @@
         "Accelerometer_x",
         "Accelerometer_y",
         "Accelerometer_z",
-
         "AccelerometerUncalibrated_x",
         "AccelerometerUncalibrated_y",
         "AccelerometerUncalibrated_z",
-
         "Gravity_x",
         "Gravity_y",
         "Gravity_z",
-
         "Gyroscope_x",
         "Gyroscope_y",
         "Gyroscope_z",
-
         "GyroscopeUncalibrated_x",
         "GyroscopeUncalibrated_y",
         "GyroscopeUncalibrated_z",
-
         "Orientation_x",
         "Orientation_y",
         "Orientation_z",
-
         "Magnetometer_x",
         "Magnetometer_y",
         "Magnetometer_z",
-
         "MagnetometerUncalibrated_x",
         "MagnetometerUncalibrated_y",
         "MagnetometerUncalibrated_z",
-
         "Barometer_x",
         "Barometer_y",
         "Barometer_z",
@@ -46,12 +38,11 @@
         "Barometer_pressure",
         "Barometer_relativeAltitude",
         "Barometer_altitude",
-
         "LocationGps_x",
         "LocationGps_y",
         "LocationGps_z",
         "LocationGps_latitude",
         "LocationGps_longitude"
     ],
-    "dev": false
+    "dev": true
 }
